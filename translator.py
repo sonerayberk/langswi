@@ -1,3 +1,8 @@
+import argparse
+import sys
+
+# Rule #2: Explicit is better than implicit.
+
 cyrillic_latin_mapping = {
     ord('q'): ord('й'),
     ord('w'): ord('ц'),
@@ -35,12 +40,17 @@ cyrillic_latin_mapping = {
 }
 
 
-def translator(input, mapping=None, reverse=False):
+def translate(
+    input: str,
+    mapping: dict = None,
+    reverse: bool = False
+) -> str:
+
     if mapping is None:
         mapping = cyrillic_latin_mapping
 
     if reverse:
-        mapping = {value: key for key, value in cyrillic_latin_mapping.items()}
+        mapping = {v: k for k, v in cyrillic_latin_mapping.items()}
 
     result = ''
     for symbol in input:
@@ -52,7 +62,20 @@ def translator(input, mapping=None, reverse=False):
     return result
 
 
+def test_translate_in_modern_way():
+    input = 'njkmrj bp ,jkmijq k.,db r nt,t'
+    result = translate(input)
+    assert result == u'только из большой любви к тебе'
+    input = 'ерфтл нщг мукн ьгср'
+    result = translate(input, reverse=True)
+    assert result == 'thank you very much'
+
+
 if __name__ == '__main__':
-    # result = translator('njkmrj bp ,jkmijq k.,db r nt,t', reverse=False)
-    result = translator('rfrjq-nj vtuf ;tcnrbq ntrcn?', reverse=False)
-    print(result)
+    parser = argparse.ArgumentParser(description='Translate cyrillic-latin texts.')
+    parser.add_argument('text', help='Text that need to be converted.')
+    parser.add_argument('--reverse', help='Use to translate from cyrillic to latin.')
+    args = parser.parse_args()
+
+    result = translate(args.text, reverse=args.reverse)
+    sys.stdout.write(result + '\n')

@@ -1,2 +1,3 @@
-# modern_translator
-Modern translator: keyboard layout fixes
+# Modern cyrillic-latin & reversed translator
+
+Keyboard layout fixes
