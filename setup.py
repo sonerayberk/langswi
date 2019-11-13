@@ -22,12 +22,20 @@ setupconf = dict(
     author_email='soner.ayberk@gmail.com',
     description='Cyrillic-latin and reverse text transformation',
     long_description=read('README.md'),
+    keywords='language switcher text transformation translation',
     packages=['langswi'],
     entry_points={
         'console_scripts': [
-            'translator=langswi.main:main'
+            'langswi=langswi.main:main'
         ]
-    }
+    },
+    classifiers=[
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+    ],
 )
 
 if __name__ == '__main__':
