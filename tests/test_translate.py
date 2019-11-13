@@ -1,6 +1,6 @@
 import pytest
 
-from translator import translate
+from langswi import translate
 
 
 @pytest.mark.parametrize('input, expected', [
