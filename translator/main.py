@@ -1,7 +1,9 @@
-import argparse
 import sys
+import subprocess
+
 
 # Rule #2: Explicit is better than implicit.
+
 
 cyrillic_latin_mapping = {
     ord('q'): ord('й'),
@@ -37,45 +39,50 @@ cyrillic_latin_mapping = {
     ord(','): ord('б'),
     ord('.'): ord('ю'),
     ord('§'): ord('ё'),
+    ord('?'): ord(','),
+    ord('&'): ord('?'),
 }
 
 
-def translate(
-    input: str,
-    mapping: dict = None,
-    reverse: bool = False
-) -> str:
+CYRILLIC_SYMBOLS = {
+    chr(symbol) for symbol in cyrillic_latin_mapping.values() if chr(symbol).isalpha()
+}
 
-    if mapping is None:
+
+def get_mapping(input: str) -> dict:
+    input = ''.join(
+        symbol for symbol in input.strip().replace(' ', '') if symbol.isalpha()
+    )
+
+    if set(input.lower()) <= CYRILLIC_SYMBOLS:
+        mapping = {v: k for k, v in cyrillic_latin_mapping.items()}
+    else:
         mapping = cyrillic_latin_mapping
 
-    if reverse:
-        mapping = {v: k for k, v in cyrillic_latin_mapping.items()}
+    return mapping
+
+
+def translate(input: str) -> str:
+    mapping = get_mapping(input)
 
     result = ''
     for symbol in input:
-        if ord(symbol) in mapping.keys():
-            result += chr(mapping[ord(symbol)])
+        if ord(symbol.lower()) in mapping.keys():
+            result += chr(mapping[ord(symbol.lower())])
         else:
             result += symbol
 
     return result
 
 
-def test_translate_in_modern_way():
-    input = 'njkmrj bp ,jkmijq k.,db r nt,t'
+def get_stdout() -> str:
+    args = ('pbpaste', 'r',)
+    process = subprocess.Popen(args, stdout=subprocess.PIPE, close_fds=True)
+    stdout, stderr = process.communicate()
+    return stdout.decode('utf-8')
+
+
+def main() -> None:
+    input = get_stdout()
     result = translate(input)
-    assert result == u'только из большой любви к тебе'
-    input = 'ерфтл нщг мукн ьгср'
-    result = translate(input, reverse=True)
-    assert result == 'thank you very much'
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Translate cyrillic-latin texts.')
-    parser.add_argument('text', help='Text that need to be converted.')
-    parser.add_argument('--reverse', help='Use to translate from cyrillic to latin.')
-    args = parser.parse_args()
-
-    result = translate(args.text, reverse=args.reverse)
     sys.stdout.write(result + '\n')
